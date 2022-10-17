@@ -83,16 +83,23 @@ def check_response(response):
 
 def parse_status(homework):
     """Извлекает статус полученной домашней работы."""
-    homework_name = homework['lesson_name']
+    homework_name = homework['homework_name']
     homework_status = homework['status']
-    fields = (homework_name, homework_status)
-    for field in fields:
-        if field in None:
-            msg = f'Пустое значение {field}'
-            logger.error(msg)
-            raise UndocumentedStatusError(msg)
+    if homework_status is None:
+        parse_status_errors(
+            'Пустое значение homework_status: ', homework_status)
+    if homework_name is None:
+        parse_status_errors(
+            'Пустое значение homework_name: ', homework_name)
     verdict = HOMEWORK_STATUSES[homework_status]
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
+
+
+def parse_status_errors(text, key):
+    """Обрабатывает пустые значения."""
+    msg = f'{text}{key}'
+    logger.error(msg)
+    raise UndocumentedStatusError(msg)
 
 
 def check_tokens():
