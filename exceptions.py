@@ -6,9 +6,5 @@ class RequestExceptionError(Exception):
     """Ошибка обработки запроса."""
 
 
-class EmptyListError(Exception):
-    """Пришел пустой список."""
-
-
 class UndocumentedStatusError(Exception):
     """Недокументированный статус."""

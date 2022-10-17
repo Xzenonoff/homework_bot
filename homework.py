@@ -7,8 +7,8 @@ import telegram
 from dotenv import load_dotenv
 from telegram import Bot
 
-from exceptions import (EmptyListError, EndpointNot200Error,
-                        RequestExceptionError, UndocumentedStatusError)
+from exceptions import (EndpointNot200Error, RequestExceptionError,
+                        UndocumentedStatusError)
 
 load_dotenv()
 
@@ -70,9 +70,8 @@ def check_response(response):
         logger.error(msg)
         raise TypeError(msg)
     if not response['homeworks']:
-        msg = 'Пришел пустой список'
-        logger.error(msg)
-        raise EmptyListError(msg)
+        logger.error('Пришел пустой список')
+        return {}
     homework_status = response['homeworks'][0].get('status')
     if homework_status not in HOMEWORK_STATUSES:
         logger.error(f'Недокументированный статус: {homework_status}')
