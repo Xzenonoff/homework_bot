@@ -73,11 +73,9 @@ def check_response(response):
         msg = 'Пришел пустой список'
         logger.error(msg)
         raise EmptyListError(msg)
-    homework_status = response['homeworks'][0]['status']
+    homework_status = response['homeworks'][0].get('status')
     if homework_status not in HOMEWORK_STATUSES:
-        msg = f'Недокументированный статус: {homework_status}'
         logger.error(f'Недокументированный статус: {homework_status}')
-        raise UndocumentedStatusError(msg)
     return response['homeworks']
 
 
