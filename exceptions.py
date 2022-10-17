@@ -8,3 +8,7 @@ class RequestExceptionError(Exception):
 
 class EmptyListError(Exception):
     """Пришел пустой список."""
+
+
+class UndocumentedStatusError(Exception):
+    """Недокументированный статус."""

@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from telegram import Bot
 
 from exceptions import (EmptyListError, EndpointNot200Error,
-                        RequestExceptionError)
+                        RequestExceptionError, UndocumentedStatusError)
 
 load_dotenv()
 
