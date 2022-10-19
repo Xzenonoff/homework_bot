@@ -121,6 +121,7 @@ def main():
     current_timestamp = 0
     send_message(bot, 'Я начал работать')
     last_msg = ''
+    last_error = ''
     while True:
         try:
             response = get_api_answer(current_timestamp)
@@ -132,8 +133,10 @@ def main():
             current_timestamp = int(time.time())
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
-            send_message(bot, message)
             logging.critical(message)
+            if last_error != message:
+                send_message(bot, message)
+                last_error = message
         finally:
             time.sleep(RETRY_TIME)
 
