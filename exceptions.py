@@ -8,11 +8,6 @@ class UndocumentedStatusError(Exception):
     pass
 
 
-class EmptyListError(Exception):
-    """Получен пустой список."""
-    pass
-
-
 class TokenError(Exception):
     """Получен пустой список."""
     pass
