@@ -82,7 +82,10 @@ def check_response(response):
         )
     homeworks_list = response['homeworks']
     if not isinstance(homeworks_list, list):
-        raise TypeError('homeworks_list не является списком')
+        raise TypeError(
+            f'homeworks_list не является списком. '
+            f'Текущий тип: {type(homeworks_list)}'
+        )
     return homeworks_list
 
 
