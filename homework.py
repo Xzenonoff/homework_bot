@@ -29,6 +29,10 @@ HOMEWORK_VERDICTS = {
 TOKENS = ('PRACTICUM_TOKEN', 'TELEGRAM_TOKEN', 'TELEGRAM_CHAT_ID')
 
 PARSE_MSG = '{text}{key}'
+GET_API_ERROR = (
+    '{ENDPOINT} не доступен. Заголовки: {HEADERS}. '
+    'Параметры: {params}. {description}'
+)
 
 
 def send_message(bot, message):
@@ -49,16 +53,23 @@ def get_api_answer(current_timestamp):
     params = {'from_date': current_timestamp}
     try:
         response = requests.get(ENDPOINT, headers=HEADERS, params=params)
-    except RequestException as request_error:
+    except RequestException as request_err:
         raise ConnectionError(
-            f'Код ответа API (RequestException): {request_error}'
+            GET_API_ERROR.format(
+                ENDPOINT=ENDPOINT,
+                HEADERS=HEADERS,
+                params=params,
+                description=f'Код ответа API (RequestException): {request_err}'
+            )
         )
     if response.status_code != 200:
         raise ServerStatusError(
-            f'{ENDPOINT} не доступен. '
-            f'Заголовки: {HEADERS}. '
-            f'Параметры: {params}. '
-            f'Код ответа: {response.status_code}'
+            GET_API_ERROR.format(
+                ENDPOINT=ENDPOINT,
+                HEADERS=HEADERS,
+                params=params,
+                description=f'Код ответа: {response.status_code}'
+            )
         )
     return response.json()
 
@@ -66,13 +77,12 @@ def get_api_answer(current_timestamp):
 def check_response(response):
     """Проверяет ответ API на корректность."""
     if not isinstance(response, dict):
-        raise TypeError('response не является словарем')
+        raise TypeError(
+            f'response не является словарем. Текущий тип: {type(response)}'
+        )
     homeworks_list = response['homeworks']
     if not isinstance(homeworks_list, list):
         raise TypeError('homeworks_list не является списком')
-    if not homeworks_list:
-        logging.info('Пришел пустой список')
-        return False
     return homeworks_list
 
 
@@ -125,11 +135,15 @@ def main():
         try:
             response = get_api_answer(current_timestamp)
             homeworks = check_response(response)
-            message = parse_status(homeworks[0]) if homeworks else False
-            if homeworks and last_msg != message:
-                send_message(bot, message)
-                last_msg = message
-            current_timestamp = response['current_date']
+            if homeworks:
+                message = parse_status(homeworks[0])
+                if last_msg != message:
+                    send_message(bot, message)
+                    last_msg = message
+            else:
+                logging.info('Статус работ не изменился')
+            if response['current_date']:
+                current_timestamp = response['current_date']
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logging.critical(message)
