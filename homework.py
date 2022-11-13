@@ -80,13 +80,13 @@ def check_response(response):
         raise TypeError(
             f'response не является словарем. Текущий тип: {type(response)}'
         )
-    homeworks_list = response['homeworks']
-    if not isinstance(homeworks_list, list):
+    homeworks = response['homeworks']
+    if not isinstance(homeworks, list):
         raise TypeError(
             f'homeworks_list не является списком. '
-            f'Текущий тип: {type(homeworks_list)}'
+            f'Текущий тип: {type(homeworks)}'
         )
-    return homeworks_list
+    return homeworks
 
 
 def parse_status(homework):
@@ -140,13 +140,14 @@ def main():
             homeworks = check_response(response)
             if homeworks:
                 message = parse_status(homeworks[0])
-                if last_msg != message:
-                    send_message(bot, message)
-                    last_msg = message
+            else:
+                message = 'Нет новых работ'
+            if last_msg != message:
+                send_message(bot, message)
+                last_msg = message
             else:
                 logging.info('Статус работ не изменился')
-            if response['current_date']:
-                current_timestamp = response['current_date']
+            current_timestamp = response.get('current_date', int(time.time()))
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logging.critical(message)
